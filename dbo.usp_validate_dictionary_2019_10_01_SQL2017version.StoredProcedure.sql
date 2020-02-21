@@ -1,10 +1,11 @@
 USE [dw_motrpac]
 GO
-/****** Object:  StoredProcedure [dbo].[usp_validate_dictionary]    Script Date: 2/21/2020 12:46:35 PM ******/
+/****** Object:  StoredProcedure [dbo].[usp_validate_dictionary_2019_10_01_SQL2017version]    Script Date: 2/21/2020 12:46:35 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
 /*
 declare @valid_result as varchar (30), @valid_msg varchar (400) 
 exec usp_validate_dictionary 2, 
@@ -17,7 +18,7 @@ exec usp_validate_dictionary 2,
 select @valid_result, @valid_msg
 */
 
-CREATE proc [dbo].[usp_validate_dictionary]
+CREATE proc [dbo].[usp_validate_dictionary_2019_10_01_SQL2017version]
 	@dict_id_cur as int,
 	@dict_new_json as varchar (max),
 	@dict_path as varchar (200) = '', --path inside of the @dict_new_json leading to the array of fields, i.e. '$.field'
@@ -33,39 +34,19 @@ declare @tb_dict_cur as table (name varchar (200))
 declare @missFields as varchar (4000) = '', @newFields varchar (4000) = ''
 
 --if @dict_path value was not provided, read it from a config file.
-if len(rtrim(ltrim(@dict_path))) = 0 
+if len(trim(@dict_path)) = 0 
 	Begin
 	select @dict_path = isnull(dbo.udf_get_config_value(@dict_id_cur, 2, 'dictionary_path'), dbo.udf_get_config_value(1, 99, 'default_dictionary_path')) --get config value, but if nothing is provided use default from global config entity --'$.field'
 	End
 
 --print @dict_path --for testing only
 
---following uses a temp table to overcome limitations of SQL Server 2016 that cannot work with Path parameter passed as variable
-create table #dict_new (name varchar (200))
---get list of columns from new dictionary
-declare @str varchar (max)
-set @str = 
-	'insert into #dict_new (name)
-	select name from OpenJson (''' + @dict_new_json + ''', ''' + @dict_path + ''')
-	with (
-			[name] varchar (200)
-			)'
---print @str
-exec (@str)
-
-insert into @tb_dict_new (name)
-select name from #dict_new
-
-IF OBJECT_ID('tempdb..#dict_new') IS NOT NULL DROP TABLE #dict_new
-
-/*
 --get list of columns from new dictionary
 insert into @tb_dict_new (name)
 select name from OpenJson (@dict_new_json, @dict_path)
 with (
 		[name] varchar (200)
 		)
-*/
 
 --select * from @tb_dict_new --for testing only
 
@@ -76,7 +57,7 @@ from @tb_dict_new
 group by name
 having count (*) > 1
 
-If len(rtrim(ltrim(@valid_result))) > 0
+If len(trim(@valid_result)) > 0
 	--if validation result is not empty, an error happen => break procedure execution
 	return
 
@@ -85,9 +66,9 @@ If len(rtrim(ltrim(@valid_result))) > 0
 --get dictionary information for the current dictionary
 create table #dict (
 	dict_id int,
-	name varchar (2000),
+	name varchar (50),
 	description varchar (200), 
-	label varchar (2000),
+	label varchar (50),
 	type varchar (20),
 	code int,
 	value varchar (200)

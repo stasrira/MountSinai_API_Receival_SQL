@@ -1,11 +1,12 @@
 USE [dw_motrpac]
 GO
-/****** Object:  StoredProcedure [dbo].[usp_load_single_sample]    Script Date: 2/21/2020 12:46:35 PM ******/
+/****** Object:  StoredProcedure [dbo].[usp_load_single_sample_2019_10_01_SQL2017_version]    Script Date: 2/21/2020 12:46:35 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 
+--select * from dw_metadata where study_id = 4
 /*
 exec usp_load_single_sample 
 	@study_id = 4, 
@@ -20,7 +21,7 @@ exec usp_load_single_sample
 	--'{"field": [{"description": "", "encoding": "null", "label": "Col1", "type": "varchar", "name": "Col1"}, {"description": "", "encoding": "null", "label": "Col2", "type": "varchar", "name": "Col2"}, {"description": "", "encoding": "null", "label": "Col3", "type": "varchar", "name": "Col3"}, {"description": "", "encoding": "null", "label": "Col4", "type": "varchar", "name": "Col4"}]}',
 */
 
-CREATE proc [dbo].[usp_load_single_sample]
+CREATE proc [dbo].[usp_load_single_sample_2019_10_01_SQL2017_version]
 	@study_id int,
 	@sample_id varchar (100),
 	@json varchar (max),
@@ -42,10 +43,10 @@ as
 	if isnull(@study_id, 0) <= 0 or not exists (select * from dw_studies where study_id = @study_id)
 		begin
 			set @outStatus = @status_failed
-			set @outStatusDesc = 'Invalid study_id (' + cast (isnull(@study_id, 'Null') as varchar (20)) + ') was supplied.'
+			set @outStatusDesc = 'Invalid study_id (' + cast (isnull(@study_id, 'Null') as varchar (20)) + ' was supplied.'
 		end 
 	
-	If len (rtrim(ltrim(@outStatus))) = 0 
+	If len (trim(@outStatus)) = 0 
 		--if status is still OK, proceed here
 		Begin 
 
@@ -58,7 +59,7 @@ as
 		select @dict_id = dict_id from dw_studies where study_id = @study_id
 
 		--if @dict_path value was not provided, read it from a config file.
-		if len(rtrim(ltrim(@dict_path))) = 0 
+		if len(trim(@dict_path)) = 0 
 			Begin
 			select @dict_path = isnull(dbo.udf_get_config_value(@dict_id, 2, 'dictionary_path'), dbo.udf_get_config_value(1, 99, 'default_dictionary_path')) --get config value, but if nothing is provided use default from global config entity --'$.field'
 			End
@@ -81,35 +82,8 @@ as
 
 			declare @tb_wrong_column_names as table (sample_id varchar (100), col_names varchar (2000))
 
-			--===============
-			--following uses a temp table to overcome limitations of SQL Server 2016 that cannot work with Path parameter passed as variable
-			--get dictionary information for the current dictionary
-			create table #dict (
-				dict_id int,
-				name varchar (500),
-				description varchar (200), 
-				label varchar (500),
-				type varchar (20),
-				code int,
-				value varchar (200)
-				)
-			Insert into #dict exec usp_get_dictionary @dict_id
-
-			--select * from #dict --for testing only
-
-			declare @tb_dict_cur as table (name varchar (250) COLLATE DATABASE_DEFAULT) --"SQL_Latin1_General_CP1_CI_AS" and "Latin1_General_BIN2"
-
-			--get list of columns for existing dictionary
-			insert into @tb_dict_cur (name) select distinct name from #dict
-			--select * from @tb_dict_cur --for testing only
-
-			IF OBJECT_ID('tempdb..#dict') IS NOT NULL DROP TABLE #dict
-
-			--===============
-
 			--Validate column names of the provided metadata JSON vs. associated dictionary and report not matching columns
 			;with tb_dict as (
-				/* this works only in SQL Server 2017 and up; replaced with code for 2016 version
 				--get list of columns from dictionary
 				select df.name dict_col --,s.dict_id, d.dict_json, 
 				from dw_dictionaries d 
@@ -119,16 +93,11 @@ as
 						[name] varchar (200)
 						) df
 				where d.dict_id = @dict_id
-				*/
-
-				select name dict_col
-				from @tb_dict_cur
-
 			)
 			--select distinct dict_col from tb_dict
 			,tb_sample as (
 				--get list of column names from samples
-				select m.sample_id, c.[key] COLLATE DATABASE_DEFAULT sample_col 
+				select m.sample_id, c.[key] sample_col
 				from @tmp_metadata m --json_values 
 				CROSS APPLY 
 				OPENJSON (m.sample_data) c 
