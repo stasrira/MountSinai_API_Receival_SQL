@@ -1,6 +1,5 @@
 USE [dw_motrpac]
 GO
-/****** Object:  StoredProcedure [dbo].[usp_send_all_available_tap_reports]    Script Date: 2/21/2020 12:46:35 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON

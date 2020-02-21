@@ -1,6 +1,5 @@
 USE [dw_motrpac]
 GO
-/****** Object:  Table [dbo].[dw_metadata_modification_log]    Script Date: 2/21/2020 12:46:35 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -17,6 +16,24 @@ PRIMARY KEY CLUSTERED
 	[log_id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+CREATE NONCLUSTERED INDEX [idx1_dw_metadata_modification_log] ON [dbo].[dw_metadata_modification_log]
+(
+	[sample_id] ASC,
+	[sample_retrieval_id] ASC,
+	[study_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+CREATE NONCLUSTERED INDEX [idx2_dw_metadata_modification_log] ON [dbo].[dw_metadata_modification_log]
+(
+	[datetime_stamp] ASC,
+	[sample_retrieval_id] ASC,
+	[study_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[dw_metadata_modification_log] ADD  DEFAULT (getdate()) FOR [datetime_stamp]
 GO

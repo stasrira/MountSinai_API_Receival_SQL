@@ -1,6 +1,5 @@
 USE [dw_motrpac]
 GO
-/****** Object:  View [dbo].[vw_get_study_stats]    Script Date: 2/21/2020 12:46:35 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON

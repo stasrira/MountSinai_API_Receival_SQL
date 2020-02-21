@@ -1,6 +1,5 @@
 USE [dw_motrpac]
 GO
-/****** Object:  StoredProcedure [dbo].[usp_get_api_data_motrpac_ForSQLServer2017]    Script Date: 2/21/2020 12:46:35 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON

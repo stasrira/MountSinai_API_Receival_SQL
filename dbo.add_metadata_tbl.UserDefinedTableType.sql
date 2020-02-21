@@ -1,6 +1,5 @@
 USE [dw_motrpac]
 GO
-/****** Object:  UserDefinedTableType [dbo].[add_metadata_tbl]    Script Date: 2/21/2020 12:46:35 PM ******/
 CREATE TYPE [dbo].[add_metadata_tbl] AS TABLE(
 	[sample_id] [varchar](100) NOT NULL,
 	[sample_data] [nvarchar](max) NULL,

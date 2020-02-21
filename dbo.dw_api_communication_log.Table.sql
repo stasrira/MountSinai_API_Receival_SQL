@@ -1,6 +1,5 @@
 USE [dw_motrpac]
 GO
-/****** Object:  Table [dbo].[dw_api_communication_log]    Script Date: 2/21/2020 12:46:35 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -18,6 +17,21 @@ CREATE TABLE [dbo].[dw_api_communication_log](
 	[row_id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+CREATE NONCLUSTERED INDEX [idx1_dw_api_communication_log] ON [dbo].[dw_api_communication_log]
+(
+	[logName] ASC,
+	[logType] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+CREATE NONCLUSTERED INDEX [idx2_dw_api_communication_log] ON [dbo].[dw_api_communication_log]
+(
+	[api_retrieval_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[dw_api_communication_log] ADD  CONSTRAINT [DF__dw_api_co__datet__0A338187]  DEFAULT (getdate()) FOR [datetime_stamp]
 GO
